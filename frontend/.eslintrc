@@ -1,0 +1,130 @@
+{
+  "extends": [
+    "react-app",
+    "airbnb",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:jsx-a11y/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "env": {
+    "browser": true,
+    "jest": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "@typescript-eslint",
+    "prettier",
+    "jsx-a11y",
+    "testing-library",
+    "typescript-sort-keys",
+    "sort-destructure-keys",
+    "import",
+    "unused-imports"
+  ],
+  "rules": {
+    "react/require-default-props": "off",
+    "react/function-component-definition": "off",
+    "react/jsx-no-useless-fragment": "off",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
+    "import/no-extraneous-dependencies": "off",
+    "react/prop-types": "off",
+    "unused-imports/no-unused-imports": "error",
+    "react/jsx-no-duplicate-props": ["error", { "ignoreCase": false }],
+    "no-param-reassign": [
+      "error",
+      { "props": true, "ignorePropertyModificationsFor": ["slice"] }
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "ts": "never",
+        "tsx": "never",
+        "js": "never",
+        "jsx": "never",
+        "mjs": "never"
+      }
+    ],
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [".tsx"]
+      }
+    ],
+    "prettier/prettier": ["warn"],
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": ["error"],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "react/jsx-props-no-spreading": "off",
+    "prefer-promise-reject-errors": "off",
+    "jsx-a11y/label-has-associated-control": [
+      2,
+      {
+        "required": {
+          "some": ["nesting", "id"]
+        }
+      }
+    ],
+    "linebreak-style": "off",
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": ["error"],
+    "default-param-last": "off",
+    "prefer-regex-literals": "off",
+    "import/prefer-default-export": "off",
+    "react/jsx-sort-props": ["warn"],
+    "typescript-sort-keys/interface": ["warn"],
+    "sort-destructure-keys/sort-destructure-keys": ["warn"],
+    "no-restricted-imports": ["error", { 
+      "paths": [{
+          "name": "@mui/styles",
+          "importNames": ["styled"],
+          "message": "import 'styled' from '@mui/material/styles'"
+        }, {
+          "name": "@mui/styles",
+          "importNames": ["useTheme"],
+          "message": "import 'useTheme' from '@mui/material/styles'"
+        }]
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "moduleDirectory": ["node_modules", "src/"],
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".d.ts"]
+      }
+    }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/tests/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)"
+      ],
+      "excludedFiles": [
+        "**/tests/mocks/*.[jt]s?(x)"
+      ],
+      "plugins": ["no-only-tests"],
+      "rules": {
+        "no-restricted-imports": ["warn", { 
+          "paths": [{
+              "name": "tests/mocks/dom",
+              "importNames": ["logDom"],
+              "message": "logDom is only used for testing in local environment."
+            }]
+          }
+        ],
+        "no-only-tests/no-only-tests": "error",
+        "testing-library/no-render-in-setup": ["error", {"allowTestingFrameworkSetupHook": "beforeEach"}]
+      },
+      "extends": [
+        "plugin:testing-library/react"
+      ]
+    }
+  ]
+}
