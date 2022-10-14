@@ -2,6 +2,24 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+# install
+
+```
+cd backend
+npm i
+node index.js
+```
+
+```
+cd frontend
+npm i
+```
+
+Kopiera innehållet i .env.local.example till .env.local
+
+``` 
+npm start
+```
 ## Recommended settings
 
 ### nvm
