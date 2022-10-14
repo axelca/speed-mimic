@@ -12,3 +12,11 @@ interface Message {
 export interface LoginMessage extends Message {
   username: string;
 }
+
+export interface Coordinate {
+  x: number;
+  y: number;
+}
+export interface DrawMessage extends Message {
+  coordinates: Coordinate[];
+}

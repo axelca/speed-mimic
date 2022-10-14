@@ -3,7 +3,7 @@
 import * as webSocket from "ws";
 import * as http from "http";
 import { v4 } from 'uuid';
-import { CustomWebSocket } from "./types";
+import { CustomWebSocket, LoginMessage, Message, MessageTypeEnum } from "./types";
 
 const server = http.createServer();
 
@@ -37,7 +37,7 @@ wss.on('connection', (ws: CustomWebSocket) => {
   ws.message = 0;
 
   ws.on('error', console.error);
-  ws.on('message', message);
+  ws.on('message', handleMessage);
   ws.on('pong', heartbeat);
 });
 
@@ -60,42 +60,34 @@ const generateUsername = (username: string, i: number) => {
   return generateUsername(`${username}${i}`, i + 1);
 };
 
-function message(data: webSocket.RawData, isBinary: boolean) {
-  const enc = new TextDecoder('utf-8');
-  const decodedData = enc.decode(data as ArrayBuffer);
-  const parsedJson = JSON.parse(decodedData);
+const handleLoginMessage = (client: CustomWebSocket, data: LoginMessage) => {
+  const username = data.username;
+  client.info.username = generateUsername(username, 0);
+}
 
-  if (parsedJson.type === 'LOGIN') {
-    const username = parsedJson.username;
-    this.info.username = generateUsername(username, 0);
-  }
-
-  this.isAlive = true;
-  this.message++;
-
-  wss.clients.forEach((client: CustomWebSocket) => {
-    console.log(client.info);
-  });
-
+const handleDrawMessage = (ws: CustomWebSocket, rawData: webSocket.RawData, isBinary: boolean) => {
   wss.clients.forEach((client) => {
-    if (client.readyState === webSocket.OPEN) {
-      client.send(data, { binary: isBinary }, (err) => {
-        if (err) {
-          return;
-        }
-
-        if (--this.message === 0 && this.isPaused) {
-          this.resume();
-        }
-      });
+    if (client !== ws && client.readyState === webSocket.OPEN) {
+      client.send(rawData, { binary: isBinary });
     }
   });
+}
 
-  if (this.bufferedAmount >= highWaterMark && !this.isPaused) {
-    this.pause();
+const rawDataToJson = (rawData: webSocket.RawData): Message => {
+  const enc = new TextDecoder('utf-8');
+  const decodedData = enc.decode(rawData as ArrayBuffer);
+  return JSON.parse(decodedData) as Message;
+}
 
-    // This is used only for testing.
-    this.emit('pause');
+function handleMessage(rawData: webSocket.RawData, isBinary: boolean) {
+  const data = rawDataToJson(rawData);
+
+  if (data.type === MessageTypeEnum.Login) {
+    handleLoginMessage(this, data as LoginMessage);
+  }
+
+  if (data.type === MessageTypeEnum.Draw) {
+    handleDrawMessage(this, rawData, isBinary);
   }
 }
 

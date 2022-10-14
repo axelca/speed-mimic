@@ -1,6 +1,7 @@
 import Messages from "./Messages";
 import Login from "./Login";
 import Status from "./Status";
+import Draw from "./Draw";
 
 function App() {
   return (
@@ -8,6 +9,7 @@ function App() {
       <Status />
       <Messages />
       <Login />
+      <Draw />
     </>
   );
 }
