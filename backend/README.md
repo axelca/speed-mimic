@@ -28,7 +28,7 @@ Simple WebSocket echo server.
 git clone https://github.com/websockets/websocket-echo-server.git
 cd websocket-echo-server
 npm ci --production
-node index.js
+npm start
 ```
 
 ## Running the server in a Docker container

@@ -1,12 +1,13 @@
 'use strict';
 
-const http = require('http');
-const WebSocket = require('ws');
-const v4 = require('uuid').v4;
+import * as webSocket from "ws";
+import * as http from "http";
+import { v4 } from 'uuid';
+import { CustomWebSocket } from "./types";
 
 const server = http.createServer();
 
-server.on('request', function request(req, res) {
+server.on('request', (_req, res) => {
   const body = http.STATUS_CODES[426];
 
   res.writeHead(426, {
@@ -21,12 +22,12 @@ server.on('request', function request(req, res) {
 const { env } = process;
 const highWaterMark = +env.HIGH_WATER_MARK || 16384;
 
-const wss = new WebSocket.Server({
+const wss = new webSocket.Server({
   maxPayload: +env.MAX_MESSAGE_SIZE || 64 * 1024,
   server
 });
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', (ws: CustomWebSocket) => {
   ws.info = {
     id: v4(),
     username: undefined
@@ -40,11 +41,13 @@ wss.on('connection', function connection(ws) {
   ws.on('pong', heartbeat);
 });
 
-const generateUsername = (username, i) => {
+const generateUsername = (username: string, i: number) => {
   let isUsernameTaken = false;
 
   for (const client of wss.clients) {
-    if (client.info.username === username) {
+    const customClient = client as CustomWebSocket;
+
+    if (customClient.info.username === username) {
       isUsernameTaken = true;
       break;
     }
@@ -57,45 +60,42 @@ const generateUsername = (username, i) => {
   return generateUsername(`${username}${i}`, i + 1);
 };
 
-function message(data, binary) {
-  const client = this;
+function message(data: webSocket.RawData, isBinary: boolean) {
   const enc = new TextDecoder('utf-8');
-  const decodedData = enc.decode(data);
+  const decodedData = enc.decode(data as ArrayBuffer);
   const parsedJson = JSON.parse(decodedData);
 
   if (parsedJson.type === 'LOGIN') {
-    console.log(parsedJson.type);
     const username = parsedJson.username;
-    client.info.username = generateUsername(username, 0);
+    this.info.username = generateUsername(username, 0);
   }
 
-  client.isAlive = true;
-  client.message++;
+  this.isAlive = true;
+  this.message++;
 
-  wss.clients.forEach((client) => {
+  wss.clients.forEach((client: CustomWebSocket) => {
     console.log(client.info);
   });
 
   wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(data, { binary }, (err) => {
-        /* istanbul ignore if */
+    if (client.readyState === webSocket.OPEN) {
+      client.send(data, { binary: isBinary }, (err) => {
         if (err) {
           return;
         }
 
-        if (--client.message === 0 && client.isPaused) {
-          client.resume();
+        if (--this.message === 0 && this.isPaused) {
+          this.resume();
         }
       });
     }
   });
 
-  if (client.bufferedAmount >= highWaterMark && !client.isPaused) {
-    client.pause();
+  if (this.bufferedAmount >= highWaterMark && !this.isPaused) {
+    this.pause();
 
     // This is used only for testing.
-    client.emit('pause');
+    this.emit('pause');
   }
 }
 
@@ -104,28 +104,27 @@ function heartbeat() {
 }
 
 setInterval(function interval() {
-  for (const ws of wss.clients) {
-    if (ws.isAlive === false) {
-      ws.terminate();
+  for (const client of wss.clients) {
+    const customClient = client as CustomWebSocket;
+
+    if (customClient.isAlive === false) {
+      customClient.terminate();
       continue;
     }
 
-    ws.isAlive = false;
-    ws.ping();
+    customClient.isAlive = false;
+    customClient.ping();
   }
 }, +env.HEARTBEAT_INTERVAL || 30000).unref();
 
+const port = +env.BIND_PORT || 8000;
+
 if (require.main === module) {
   server.on('listening', function listening() {
-    const { address, family, port } = server.address();
-    console.log(
-      'Server listening on %s:%d',
-      family === 'IPv6' ? `[${address}]` : address,
-      port
-    );
+    console.log(`server listening on port`, port);
   });
 
-  server.listen(+env.BIND_PORT || 8000, env.BIND_ADDRESS || '::');
+  server.listen(port, env.BIND_ADDRESS || '::');
 }
 
 module.exports = { server, wss };
