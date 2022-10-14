@@ -1,5 +1,5 @@
 import Messages from "./Messages";
-import SendMessage from "./SendMessage";
+import Login from "./Login";
 import Status from "./Status";
 
 function App() {
@@ -7,7 +7,7 @@ function App() {
     <>
       <Status />
       <Messages />
-      <SendMessage />
+      <Login />
     </>
   );
 }

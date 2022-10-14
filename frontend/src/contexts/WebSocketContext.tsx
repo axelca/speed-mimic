@@ -1,9 +1,11 @@
 import { createContext, useContext, useMemo } from "react";
 import useWebSocket, { ReadyState, SendMessage } from "react-use-websocket";
+import { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 
 type WebSocketContextType = {
   lastMessage: MessageEvent | null;
   readyState: ReadyState;
+  sendJsonMessage: SendJsonMessage;
   sendMessage: SendMessage;
 };
 
@@ -13,20 +15,23 @@ const WebSocketContext = createContext<WebSocketContextType>({
   sendMessage: () => {
     // intentional empty function
   },
+  sendJsonMessage: () => {
+    // intentional empty function
+  },
 });
 
 const WebSocketProvider = ({ children }: { children: JSX.Element }) => {
-  const { lastMessage, readyState, sendMessage } = useWebSocket(
-    process.env.REACT_APP_SOCKET_URL || ""
-  );
+  const { lastMessage, readyState, sendJsonMessage, sendMessage } =
+    useWebSocket(process.env.REACT_APP_SOCKET_URL || "");
 
   const value = useMemo<WebSocketContextType>(
     () => ({
       lastMessage,
       readyState,
       sendMessage,
+      sendJsonMessage,
     }),
-    [lastMessage, readyState, sendMessage]
+    [lastMessage, readyState, sendMessage, sendJsonMessage]
   );
 
   return (

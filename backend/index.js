@@ -2,6 +2,7 @@
 
 const http = require('http');
 const WebSocket = require('ws');
+const v4 = require('uuid').v4;
 
 const server = http.createServer();
 
@@ -25,9 +26,12 @@ const wss = new WebSocket.Server({
   server
 });
 
-wss.on('connection', function connection(ws, _request, client) {
-  console.log(client);
-  console.log('user connected');
+wss.on('connection', function connection(ws) {
+  ws.info = {
+    id: v4(),
+    username: undefined
+  };
+
   ws.isAlive = true;
   ws.message = 0;
 
@@ -36,9 +40,41 @@ wss.on('connection', function connection(ws, _request, client) {
   ws.on('pong', heartbeat);
 });
 
+const generateUsername = (username, i) => {
+  let isUsernameTaken = false;
+
+  for (const client of wss.clients) {
+    if (client.info.username === username) {
+      isUsernameTaken = true;
+      break;
+    }
+  }
+
+  if (!isUsernameTaken) {
+    return username;
+  }
+
+  return generateUsername(`${username}${i}`, i + 1);
+};
+
 function message(data, binary) {
-  this.isAlive = true;
-  this.message++;
+  const client = this;
+  const enc = new TextDecoder('utf-8');
+  const decodedData = enc.decode(data);
+  const parsedJson = JSON.parse(decodedData);
+
+  if (parsedJson.type === 'LOGIN') {
+    console.log(parsedJson.type);
+    const username = parsedJson.username;
+    client.info.username = generateUsername(username, 0);
+  }
+
+  client.isAlive = true;
+  client.message++;
+
+  wss.clients.forEach((client) => {
+    console.log(client.info);
+  });
 
   wss.clients.forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
@@ -48,18 +84,18 @@ function message(data, binary) {
           return;
         }
 
-        if (--this.message === 0 && this.isPaused) {
-          this.resume();
+        if (--client.message === 0 && client.isPaused) {
+          client.resume();
         }
       });
     }
   });
 
-  if (this.bufferedAmount >= highWaterMark && !this.isPaused) {
-    this.pause();
+  if (client.bufferedAmount >= highWaterMark && !client.isPaused) {
+    client.pause();
 
     // This is used only for testing.
-    this.emit('pause');
+    client.emit('pause');
   }
 }
 
