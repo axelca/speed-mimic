@@ -4,7 +4,7 @@ import { useWebSocketContext } from "../contexts/WebSocketContext";
 import { Message, MessageTypeEnum } from "../types/messages";
 
 const Restart: FC = () => {
-  const { sendJsonMessage } = useWebSocketContext();
+  const { isAdmin, sendJsonMessage } = useWebSocketContext();
 
   const handleClick = () => {
     const restartMessage: Message = {
@@ -15,7 +15,7 @@ const Restart: FC = () => {
   };
 
   return (
-    <button onClick={handleClick} type="button">
+    <button disabled={!isAdmin} onClick={handleClick} type="button">
       Restart
     </button>
   );

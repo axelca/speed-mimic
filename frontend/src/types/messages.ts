@@ -2,8 +2,12 @@ export type MessageType = "LOGIN" | "DRAW";
 
 export enum MessageTypeEnum {
   Login = "LOGIN",
-  Draw = "DRAW",
+  AssignedUsername = "ASSIGNED_USERNAME",
+  Role = "ROLE",
   Restart = "RESTART",
+  GameState = "GAME_STATE",
+  Draw = "DRAW",
+  IsAdmin = "IS_ADMIN",
 }
 
 export interface Message {
@@ -13,4 +17,9 @@ export interface Message {
 export interface Coordinate {
   x: number;
   y: number;
+}
+
+export enum RoleEnum {
+  Participant = "PARTICIPANT",
+  GameLeader = "GAME_LEADER",
 }

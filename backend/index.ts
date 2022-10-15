@@ -92,6 +92,9 @@ const handleLoginMessage = (client: CustomWebSocket, message: Message) => {
 const handleAnswerLoginMessage = (ws: CustomWebSocket, isBinary: boolean) => {
     if (ws.readyState === webSocket.OPEN) {
       ws.send(jsonToRawData({ type: MessageTypeEnum.AssignedUsername, data: ws.info.username }), { binary: isBinary });
+      if (ws.info.isAdmin) {
+        ws.send(jsonToRawData({ type: MessageTypeEnum.IsAdmin, data: true }), { binary: isBinary });
+      }
     }
 }
 
