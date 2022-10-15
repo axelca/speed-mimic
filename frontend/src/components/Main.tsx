@@ -9,13 +9,13 @@ function Main() {
   return (
     <Container>
       <Row>
-        <Col md="6">
+        <Col md="8">
           <GamePlan />
         </Col>
-        <Col md="3">
+        <Col md="2">
           <Lobby />
         </Col>
-        <Col md="3" xs>
+        <Col md="2">
           <Chat />
         </Col>
       </Row>

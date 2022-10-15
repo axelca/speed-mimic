@@ -1,5 +1,12 @@
 import { FC } from "react";
+import Draw from "./Draw";
+import TestImageTransfer from "./TestImageTransfer";
 
-const Main: FC = () => <div id="GameplanContent">Gameplan</div>;
-
-export default Main;
+const Gameplan: FC = () => (
+  <>
+    <div>Gameplan</div>
+    <Draw />
+    <TestImageTransfer />
+  </>
+);
+export default Gameplan;
