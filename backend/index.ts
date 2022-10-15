@@ -141,12 +141,12 @@ setInterval(function interval() {
 
 const port = +env.BIND_PORT || 8000;
 
-if (require.main === module) {
+console.log(require.main)
+
   server.on('listening', function listening() {
     console.log(`server listening on port`, port);
   });
 
   server.listen(port, env.BIND_ADDRESS || '::');
-}
 
 module.exports = { server, wss };
