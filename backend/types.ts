@@ -19,6 +19,7 @@ export enum MessageTypeEnum {
   GameState = "GAME_STATE",
   Draw = "DRAW",
   IsAdmin = "IS_ADMIN",
+  Chat = "CHAT"
 }
 
 interface Coordinate {

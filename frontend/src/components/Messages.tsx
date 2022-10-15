@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from "react";
+import { Accordion } from "react-bootstrap";
 import { useWebSocketContext } from "../contexts/WebSocketContext";
 import Message from "./Message";
 
@@ -13,16 +14,29 @@ const Messages: FC = () => {
   }, [lastMessage, setMessages]);
 
   return (
-    <div>
-      {messages.length ? (
-        <ul>
-          {messages.map(({ data, timeStamp }) => (
-            <Message key={`${data}-${timeStamp}`} message={data} />
-          ))}
-        </ul>
-      ) : (
-        <div>no messages yet :(</div>
-      )}
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      <Accordion>
+        <Accordion.Item eventKey="0">
+          <Accordion.Header>Message debugger</Accordion.Header>
+          <Accordion.Body>
+            {messages.length ? (
+              <ul>
+                {messages.map(({ data, timeStamp }) => (
+                  <Message key={`${data}-${timeStamp}`} message={data} />
+                ))}
+              </ul>
+            ) : (
+              <div>no messages yet :(</div>
+            )}
+          </Accordion.Body>
+        </Accordion.Item>
+      </Accordion>
     </div>
   );
 };

@@ -5,13 +5,12 @@ import DisplayImageControl, {
 } from "./display-image-control/DisplayImageControl";
 
 const TestImageTransfer: FC = () => {
-  const imageWidth = 700;
+  const imageWidth = 620;
   const imageHeight = 300;
 
   const ref = createRef<DisplayImageRefs>();
 
   const drawingSubmitted = (buffer: ArrayBufferLike | null) => {
-    console.log('test');
     ref.current?.redrawImage(buffer);
   };
 

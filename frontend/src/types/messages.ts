@@ -8,6 +8,7 @@ export enum MessageTypeEnum {
   GameState = "GAME_STATE",
   Draw = "DRAW",
   IsAdmin = "IS_ADMIN",
+  Chat = "CHAT",
 }
 
 export interface Message {

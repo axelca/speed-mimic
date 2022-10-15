@@ -7,6 +7,7 @@ import { MessageTypeEnum, RoleEnum } from "../types/messages";
 const defaultRole = RoleEnum.Participant;
 const defaultIsAdmin = false;
 const defaultGameState = GameStateEnum.Paused;
+const defaultUsername = "";
 
 type WebSocketContextType = {
   gameState: GameStateEnum;
@@ -16,6 +17,7 @@ type WebSocketContextType = {
   role: RoleEnum;
   sendJsonMessage: SendJsonMessage;
   sendMessage: SendMessage;
+  username: string;
 };
 
 const WebSocketContext = createContext<WebSocketContextType>({
@@ -30,9 +32,11 @@ const WebSocketContext = createContext<WebSocketContextType>({
   },
   role: defaultRole,
   isAdmin: defaultIsAdmin,
+  username: defaultUsername,
 });
 
 const WebSocketProvider = ({ children }: { children: JSX.Element }) => {
+  const [username, setUsername] = useState(defaultUsername);
   const [role, setRole] = useState(defaultRole);
   const [isAdmin, setIsAdmin] = useState(defaultIsAdmin);
   const [gameState, setGameState] = useState(defaultGameState);
@@ -49,6 +53,7 @@ const WebSocketProvider = ({ children }: { children: JSX.Element }) => {
       role,
       isAdmin,
       gameState,
+      username,
     }),
     [
       lastMessage,
@@ -58,6 +63,7 @@ const WebSocketProvider = ({ children }: { children: JSX.Element }) => {
       role,
       isAdmin,
       gameState,
+      username,
     ]
   );
 
@@ -94,6 +100,18 @@ const WebSocketProvider = ({ children }: { children: JSX.Element }) => {
 
     if (parsedData.type === MessageTypeEnum.GameState) {
       setGameState(parsedData.data);
+    }
+  }, [lastMessage?.data, lastMessage?.type]);
+
+  useEffect(() => {
+    if (!lastMessage?.data) {
+      return;
+    }
+
+    const parsedData = JSON.parse(lastMessage.data);
+
+    if (parsedData.type === MessageTypeEnum.AssignedUsername) {
+      setUsername(parsedData.data);
     }
   }, [lastMessage?.data, lastMessage?.type]);
 

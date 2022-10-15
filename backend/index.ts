@@ -106,6 +106,14 @@ const handleDrawMessage = (ws: CustomWebSocket, rawData: webSocket.RawData, isBi
   });
 }
 
+const handleChatMessage = (ws: CustomWebSocket, chatMessage: Message, isBinary: boolean) => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === webSocket.OPEN) {
+      client.send(jsonToRawData({ type: MessageTypeEnum.Chat, data: `${ws.info.username} ${chatMessage.data}`}), { binary: isBinary });
+    }
+  });
+}
+
 function handleMessage(rawData: webSocket.RawData, isBinary: boolean) {
   const data = rawDataToJson(rawData);
 
@@ -115,12 +123,16 @@ function handleMessage(rawData: webSocket.RawData, isBinary: boolean) {
   }
 
   if (data.type === MessageTypeEnum.Login) {
-    handleLoginMessage(this, data as Message);
+    handleLoginMessage(this, data);
     handleAnswerLoginMessage(this, isBinary);
   }
 
   if (data.type === MessageTypeEnum.Draw) {
     handleDrawMessage(this, rawData, isBinary);
+  }
+
+  if (data.type === MessageTypeEnum.Chat) {
+    handleChatMessage(this, data, isBinary);
   }
 }
 
