@@ -18,6 +18,7 @@ export enum MessageTypeEnum {
   Restart = "RESTART",
   GameState = "GAME_STATE",
   Draw = "DRAW",
+  IsAdmin = "IS_ADMIN",
 }
 
 interface Coordinate {
@@ -27,7 +28,7 @@ interface Coordinate {
 
 export interface Message {
   type: MessageTypeEnum;
-  data: string | Coordinate[];
+  data: string | Coordinate[] | boolean;
 }
 
 export enum GameStateEnum {
