@@ -9,5 +9,6 @@ COPY package*.json ./
 RUN set -ex && npm ci --production
 
 COPY --chown=node:node . .
-
-CMD ["node", "index.js"]
+RUN npm install
+EXPOSE 8000
+CMD ["npm", "start"]
