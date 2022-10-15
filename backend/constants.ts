@@ -1,0 +1,1 @@
+export const admins = ["anna", "anders", "axel", "christian", "sofie", "yngve"];

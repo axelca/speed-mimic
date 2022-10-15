@@ -5,6 +5,7 @@ export interface CustomWebSocket extends WebSocket {
     id: string;
     username: string;
     isAdmin: boolean;
+    role: RoleEnum;
   }
   isAlive: boolean;
   message: number;
@@ -13,6 +14,7 @@ export interface CustomWebSocket extends WebSocket {
 export enum MessageTypeEnum {
   Login = "LOGIN",
   AssignedUsername = "ASSIGNED_USERNAME",
+  Role = "ROLE",
   Restart = "RESTART",
   GameState = "GAME_STATE",
   Draw = "DRAW",
@@ -30,7 +32,14 @@ export interface Message {
 
 export enum GameStateEnum {
   Paused = "PAUSED",
-  Started = "STARTED"
+  GameLeaderDraws = "GAME_LEADER_DRAWS",
+  ParticipantsDraw = "PARTICIPANTS_DRAW",
+  Review = "REVIEW",
+}
+
+export enum RoleEnum {
+  Participant = "PARTICIPANT",
+  GameLeader = "GAME_LEADER"
 }
 
 

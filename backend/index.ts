@@ -3,8 +3,9 @@
 import * as webSocket from "ws";
 import * as http from "http";
 import { v4 } from 'uuid';
-import { CustomWebSocket, GameStateEnum, Message, MessageTypeEnum } from "./types";
-import { jsonToRawData, rawDataToJson } from "./utils";
+import { CustomWebSocket, GameStateEnum, Message, MessageTypeEnum, RoleEnum } from "./types";
+import { generateUsername, getRandomInt, jsonToRawData, rawDataToJson } from "./utils";
+import { admins } from "./constants";
 
 const server = http.createServer();
 
@@ -34,6 +35,7 @@ wss.on('connection', (ws: CustomWebSocket) => {
     id: v4(),
     username: undefined,
     isAdmin: false,
+    role: RoleEnum.Participant,
   };
 
   ws.isAlive = true;
@@ -44,50 +46,46 @@ wss.on('connection', (ws: CustomWebSocket) => {
   ws.on('pong', heartbeat);
 });
 
-const generateUsername = (username: string, i: number) => {
-  let isUsernameTaken = false;
+const handleRestartMessage = (ws: CustomWebSocket, isBinary: boolean) => {
+  if (ws.readyState !== webSocket.OPEN || !ws.info.isAdmin) {
+    return;
+  }
 
-  for (const client of wss.clients) {
-    const customClient = client as CustomWebSocket;
+  const clients = wss.clients as Set<CustomWebSocket>; 
+  const clientsArray = Array.from(clients);
+  const randomIndex = getRandomInt(0, clientsArray.length - 1);
+  const randomUserId = clientsArray[randomIndex].info.id;
 
-    if (customClient.info.username === username) {
-      isUsernameTaken = true;
-      break;
+  clients.forEach((client) => {
+    if (client.readyState === webSocket.OPEN) {
+      if (client.info.id === randomUserId) {
+        client.info.role = RoleEnum.GameLeader
+        client.send(jsonToRawData({ type: MessageTypeEnum.Role, data: RoleEnum.GameLeader }), { binary: isBinary });
+      } else {
+        client.info.role = RoleEnum.Participant
+        client.send(jsonToRawData({ type: MessageTypeEnum.Role, data: RoleEnum.Participant }), { binary: isBinary });
+      }
     }
-  }
-
-  if (!isUsernameTaken) {
-    return username;
-  }
-
-  return generateUsername(`${username}${i}`, i + 1);
-};
-
-const handleRestartMessage = (client: CustomWebSocket) => {
-  console.log('client.info', client.info);
-  if (client.readyState === webSocket.OPEN && client.info.isAdmin) {
-    gameState = GameStateEnum.Started;
-  }
-  console.log({ gameState });
+  });
+  
+  gameState = GameStateEnum.GameLeaderDraws;
 }
 
-const handleRestartMessageAnswer = () => {
+const handleRestartMessageAnswer = (isBinary: boolean) => {
   wss.clients.forEach((client) => {
     if (client.readyState === webSocket.OPEN) {
-      // client.send(jsonToRawData({ type: MessageTypeEnum.GameState, data: GameStateEnum.Started }));
+      client.send(jsonToRawData({ type: MessageTypeEnum.GameState, data: gameState }), { binary: isBinary });
     }
   });
 }
 
 const handleLoginMessage = (client: CustomWebSocket, message: Message) => {
   const username = message.data;
-  const assignedUsername = generateUsername(username as string, 0);
+  const assignedUsername = generateUsername(username as string, 0, wss);
   client.info.username = assignedUsername;
 
-  console.log({assignedUsername})
-
-  if (assignedUsername === "axel") {
-    client.info.isAdmin === true;
+  if (admins.includes(assignedUsername)) {
+    client.info.isAdmin = true;
   }
 }
 
@@ -109,8 +107,8 @@ function handleMessage(rawData: webSocket.RawData, isBinary: boolean) {
   const data = rawDataToJson(rawData);
 
   if (data.type === MessageTypeEnum.Restart) {
-    handleRestartMessage(this);
-    handleRestartMessageAnswer();
+    handleRestartMessage(this, isBinary);
+    handleRestartMessageAnswer(isBinary);
   }
 
   if (data.type === MessageTypeEnum.Login) {
