@@ -1,0 +1,13 @@
+.display-image-control {
+    display: flex;
+    flex-direction:column;
+    margin-top: 10px;
+    width: fit-content;
+}
+
+.display-image-control__canvas {
+    border: 2px solid #808080;
+    position: relative;
+    background-color: white;
+    flex-grow: 1;
+}

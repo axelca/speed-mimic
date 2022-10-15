@@ -1,7 +1,8 @@
-import Messages from "./Messages";
-import Login from "./Login";
-import Status from "./Status";
 import Draw from "./Draw";
+import Login from "./Login";
+import Messages from "./Messages";
+import Status from "./Status";
+import TestImageTransfer from "./TestImageTransfer";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
       <Messages />
       <Login />
       <Draw />
+      <TestImageTransfer />
     </>
   );
 }

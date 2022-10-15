@@ -1,0 +1,25 @@
+.draw-image-control-menu {
+    display: flex;
+    justify-content: space-evenly;
+    border-radius: 5px;
+    align-items: center;
+    background-color: #a3a3a32d;
+    margin: auto;
+    padding: 10px;
+    list-style: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.draw-image-control-menu__item {
+    display: flex;
+    align-items: center;
+}
+
+label {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.875rem;
+    margin-right: 0.5rem;
+}
