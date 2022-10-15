@@ -5,6 +5,9 @@ import Status from "./Status";
 import TestImageTransfer from "./TestImageTransfer";
 import Restart from "./Restart";
 import GameState from "./GameState";
+import Main from "./Main";
+
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (
@@ -16,6 +19,7 @@ function App() {
       <TestImageTransfer />
       <Restart />
       <GameState />
+      <Main />
     </>
   );
 }
