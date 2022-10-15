@@ -3,6 +3,7 @@ import Login from "./Login";
 import Messages from "./Messages";
 import Status from "./Status";
 import TestImageTransfer from "./TestImageTransfer";
+import Restart from "./Restart";
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
       <Login />
       <Draw />
       <TestImageTransfer />
+      <Restart />
     </>
   );
 }

@@ -3,7 +3,8 @@
 import * as webSocket from "ws";
 import * as http from "http";
 import { v4 } from 'uuid';
-import { CustomWebSocket, LoginMessage, Message, MessageTypeEnum } from "./types";
+import { CustomWebSocket, GameStateEnum, Message, MessageTypeEnum } from "./types";
+import { jsonToRawData, rawDataToJson } from "./utils";
 
 const server = http.createServer();
 
@@ -20,7 +21,8 @@ server.on('request', (_req, res) => {
 });
 
 const { env } = process;
-const highWaterMark = +env.HIGH_WATER_MARK || 16384;
+
+let gameState = GameStateEnum.Paused;
 
 const wss = new webSocket.Server({
   maxPayload: +env.MAX_MESSAGE_SIZE || 64 * 1024,
@@ -30,7 +32,8 @@ const wss = new webSocket.Server({
 wss.on('connection', (ws: CustomWebSocket) => {
   ws.info = {
     id: v4(),
-    username: undefined
+    username: undefined,
+    isAdmin: false,
   };
 
   ws.isAlive = true;
@@ -60,9 +63,38 @@ const generateUsername = (username: string, i: number) => {
   return generateUsername(`${username}${i}`, i + 1);
 };
 
-const handleLoginMessage = (client: CustomWebSocket, data: LoginMessage) => {
-  const username = data.username;
-  client.info.username = generateUsername(username, 0);
+const handleRestartMessage = (client: CustomWebSocket) => {
+  console.log('client.info', client.info);
+  if (client.readyState === webSocket.OPEN && client.info.isAdmin) {
+    gameState = GameStateEnum.Started;
+  }
+  console.log({ gameState });
+}
+
+const handleRestartMessageAnswer = () => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === webSocket.OPEN) {
+      // client.send(jsonToRawData({ type: MessageTypeEnum.GameState, data: GameStateEnum.Started }));
+    }
+  });
+}
+
+const handleLoginMessage = (client: CustomWebSocket, message: Message) => {
+  const username = message.data;
+  const assignedUsername = generateUsername(username as string, 0);
+  client.info.username = assignedUsername;
+
+  console.log({assignedUsername})
+
+  if (assignedUsername === "axel") {
+    client.info.isAdmin === true;
+  }
+}
+
+const handleAnswerLoginMessage = (ws: CustomWebSocket, isBinary: boolean) => {
+    if (ws.readyState === webSocket.OPEN) {
+      ws.send(jsonToRawData({ type: MessageTypeEnum.AssignedUsername, data: ws.info.username }), { binary: isBinary });
+    }
 }
 
 const handleDrawMessage = (ws: CustomWebSocket, rawData: webSocket.RawData, isBinary: boolean) => {
@@ -73,17 +105,17 @@ const handleDrawMessage = (ws: CustomWebSocket, rawData: webSocket.RawData, isBi
   });
 }
 
-const rawDataToJson = (rawData: webSocket.RawData): Message => {
-  const enc = new TextDecoder('utf-8');
-  const decodedData = enc.decode(rawData as ArrayBuffer);
-  return JSON.parse(decodedData) as Message;
-}
-
 function handleMessage(rawData: webSocket.RawData, isBinary: boolean) {
   const data = rawDataToJson(rawData);
 
+  if (data.type === MessageTypeEnum.Restart) {
+    handleRestartMessage(this);
+    handleRestartMessageAnswer();
+  }
+
   if (data.type === MessageTypeEnum.Login) {
-    handleLoginMessage(this, data as LoginMessage);
+    handleLoginMessage(this, data as Message);
+    handleAnswerLoginMessage(this, isBinary);
   }
 
   if (data.type === MessageTypeEnum.Draw) {

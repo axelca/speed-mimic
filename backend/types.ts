@@ -4,30 +4,33 @@ export interface CustomWebSocket extends WebSocket {
   info: {
     id: string;
     username: string;
+    isAdmin: boolean;
   }
   isAlive: boolean;
   message: number;
 }
 
-export type MessageType = "LOGIN" | "DRAW";
-
 export enum MessageTypeEnum {
   Login = "LOGIN",
+  AssignedUsername = "ASSIGNED_USERNAME",
+  Restart = "RESTART",
+  GameState = "GAME_STATE",
   Draw = "DRAW",
-}
-
-export interface Message {
-  type: MessageTypeEnum;
-}
-
-export interface LoginMessage extends Message {
-  username: string;
 }
 
 interface Coordinate {
   x: number;
   y: number;
 }
-export interface DrawMessage extends Message {
-  coordinates: Coordinate[];
+
+export interface Message {
+  type: MessageTypeEnum;
+  data: string | Coordinate[];
 }
+
+export enum GameStateEnum {
+  Paused = "PAUSED",
+  Started = "STARTED"
+}
+
+

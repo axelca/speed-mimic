@@ -2,7 +2,7 @@ import { ChangeEvent, FC, FormEvent, useState } from "react";
 import { ReadyState } from "react-use-websocket";
 import { JsonObject } from "react-use-websocket/dist/lib/types";
 import { useWebSocketContext } from "../contexts/WebSocketContext";
-import { LoginMessage, MessageTypeEnum } from "../types/messages";
+import { Message, MessageTypeEnum } from "../types/messages";
 
 const Login: FC = () => {
   const [username, setUsername] = useState("");
@@ -15,9 +15,9 @@ const Login: FC = () => {
     event.preventDefault();
 
     if (username) {
-      const loginMessage: LoginMessage = {
+      const loginMessage: Message = {
         type: MessageTypeEnum.Login,
-        username,
+        data: username,
       };
       sendJsonMessage(loginMessage as unknown as JsonObject);
       setUsername("");

@@ -2,7 +2,7 @@ import { FC, FormEvent, useState } from "react";
 import { ReadyState } from "react-use-websocket";
 import { JsonObject } from "react-use-websocket/dist/lib/types";
 import { useWebSocketContext } from "../contexts/WebSocketContext";
-import { Coordinate, DrawMessage, MessageTypeEnum } from "../types/messages";
+import { Coordinate, Message, MessageTypeEnum } from "../types/messages";
 
 const Draw: FC = () => {
   const [coordinates] = useState<Coordinate[]>([{ x: 1, y: 2 }]);
@@ -12,9 +12,9 @@ const Draw: FC = () => {
     event.preventDefault();
 
     if (coordinates.length) {
-      const drawMessage: DrawMessage = {
+      const drawMessage: Message = {
         type: MessageTypeEnum.Draw,
-        coordinates,
+        data: coordinates,
       };
       sendJsonMessage(drawMessage as unknown as JsonObject);
     }
