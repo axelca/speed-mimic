@@ -95,7 +95,7 @@ const handleAnswerLoginMessage = (ws: CustomWebSocket, isBinary: boolean) => {
     }
 }
 
-const handleDrawMessage = (ws: CustomWebSocket, rawData: webSocket.RawData, isBinary: boolean) => {
+const handleDrawLeaderMessage = (ws: CustomWebSocket, rawData: webSocket.RawData, isBinary: boolean) => {
   wss.clients.forEach((client) => {
     if (client !== ws && client.readyState === webSocket.OPEN) {
       client.send(rawData, { binary: isBinary });
@@ -106,18 +106,18 @@ const handleDrawMessage = (ws: CustomWebSocket, rawData: webSocket.RawData, isBi
 function handleMessage(rawData: webSocket.RawData, isBinary: boolean) {
   const data = rawDataToJson(rawData);
 
-  if (data.type === MessageTypeEnum.Restart) {
-    handleRestartMessage(this, isBinary);
-    handleRestartMessageAnswer(isBinary);
-  }
-
-  if (data.type === MessageTypeEnum.Login) {
-    handleLoginMessage(this, data as Message);
-    handleAnswerLoginMessage(this, isBinary);
-  }
-
-  if (data.type === MessageTypeEnum.Draw) {
-    handleDrawMessage(this, rawData, isBinary);
+  switch(data.type) {
+    case MessageTypeEnum.Restart:
+      handleRestartMessage(this, isBinary);
+      handleRestartMessageAnswer(isBinary);
+      break;
+    case MessageTypeEnum.Login:
+      handleLoginMessage(this, data as Message);
+      handleAnswerLoginMessage(this, isBinary);
+      break;
+    case MessageTypeEnum.DrawLeader:
+      handleDrawLeaderMessage(this, rawData, isBinary);
+      break;
   }
 }
 

@@ -13,11 +13,12 @@ export interface CustomWebSocket extends WebSocket {
 
 export enum MessageTypeEnum {
   Login = "LOGIN",
+  DrawLeader = "DRAW_LEADER",
+  DrawParticipant = "DRAW_PARTICIPANT",
   AssignedUsername = "ASSIGNED_USERNAME",
   Role = "ROLE",
   Restart = "RESTART",
   GameState = "GAME_STATE",
-  Draw = "DRAW",
 }
 
 interface Coordinate {
@@ -27,7 +28,7 @@ interface Coordinate {
 
 export interface Message {
   type: MessageTypeEnum;
-  data: string | Coordinate[];
+  data: string | ArrayBufferLike | null;
 }
 
 export enum GameStateEnum {

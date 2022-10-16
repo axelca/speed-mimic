@@ -13,8 +13,8 @@ const Draw: FC = () => {
 
     if (coordinates.length) {
       const drawMessage: Message = {
-        type: MessageTypeEnum.Draw,
-        data: coordinates,
+        type: MessageTypeEnum.DrawLeader,
+        data: null
       };
       sendJsonMessage(drawMessage as unknown as JsonObject);
     }

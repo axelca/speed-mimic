@@ -3,7 +3,7 @@ import DrawImageControlMenu from "./DrawImageControlMenu";
 import "./draw-image-control.css";
 
 interface Props {
-  drawingSubmitted?: (arrayBuffer: ArrayBufferLike | null) => void;
+  drawingSubmitted?: (dataUrl: string) => void;
   height?: number;
   width?: number;
 }
@@ -75,15 +75,11 @@ const DrawImageControl: FC<Props> = ({
 
   const submitDrawing = (e: React.MouseEvent<HTMLElement>) => {
     baseDrawCmdFn((canvasCtx: CanvasRenderingContext2D) => {
-      let buffer: ArrayBufferLike | null = null;
-
       if (!drawingSubmitted) {
         return;
       }
 
-      buffer = canvasCtx.getImageData(0, 0, width, height).data.buffer;
-
-      drawingSubmitted(buffer);
+      drawingSubmitted(canvasCtx.canvas.toDataURL());
     });
   };
 

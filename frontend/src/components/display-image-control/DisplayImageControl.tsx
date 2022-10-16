@@ -3,46 +3,50 @@ import "./display-image-control.css";
 
 interface Props {
   height?: number;
-  imageDataBuffer?: ArrayBufferLike | null;
+  imageDataUrl?: string | null;
   width?: number;
 }
 
 export interface DisplayImageRefs {
-  redrawImage: (buffer: ArrayBufferLike | null) => void;
+  redrawImage: (dataUrl: string) => void;
 }
 
 const DisplayImageControl = forwardRef<DisplayImageRefs, Props>(
-  ({ height = 300, imageDataBuffer = null, width = 700 }, ref) => {
+  ({ height = 300, imageDataUrl = null, width = 700 }, ref) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const canvasStyle = { height: `${height}px`, width: `${width}px` };
-    const setCanvas = (buffer: ArrayBufferLike | null) => {
+    const setCanvas = (dataUrl: string | null) => {
       const canvas = canvasRef.current;
       const canvasCtx = canvas?.getContext("2d");
+      let image: HTMLImageElement | null = null;
 
-      if (!canvasCtx || !buffer) {
+      if (!canvasCtx || !dataUrl) {
         return;
       }
 
-      canvasCtx.putImageData(
-        new ImageData(
-          new Uint8ClampedArray(buffer),
-          canvasCtx.canvas.width,
-          canvasCtx.canvas.height
-        ),
-        0,
-        0
-      );
+      image = new Image();
+      image.onload = () => {
+        if (!image) {
+          return;
+        }
+
+        canvasCtx.drawImage(image, 0, 0);
+      };
+
+      image.src = dataUrl;
+
+      canvasCtx.drawImage(image, 0, 0);
     };
 
     useImperativeHandle(ref, () => ({
-      redrawImage(buffer: ArrayBufferLike | null) {
-        setCanvas(buffer);
+      redrawImage(dataUrl: string) {
+        setCanvas(dataUrl);
       },
     }));
 
     useEffect(() => {
-      setCanvas(imageDataBuffer);
-    }, [imageDataBuffer]);
+      setCanvas(imageDataUrl);
+    }, [imageDataUrl]);
 
     return (
       <div className="display-image-control">
