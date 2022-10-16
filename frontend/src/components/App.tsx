@@ -25,7 +25,7 @@ const Container = ({ children }: { children: JSX.Element | JSX.Element[] }) => (
 const App = () => {
   const { username } = useWebSocketContext();
 
-  // För att testa överföring av ritad data mellan clienter
+  // För att testa överföring av ritad data mellan klienter
   // return <TestImageTransfer />;
 
   if (!username) {
