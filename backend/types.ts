@@ -19,16 +19,18 @@ export enum MessageTypeEnum {
   Role = "ROLE",
   Restart = "RESTART",
   GameState = "GAME_STATE",
-}
-
-interface Coordinate {
-  x: number;
-  y: number;
+  IsAdmin = "IS_ADMIN",
+  Chat = "CHAT"
 }
 
 export interface Message {
   type: MessageTypeEnum;
-  data: string | ArrayBufferLike | null;
+  data?: any;
+}
+
+export enum RoleEnum {
+  Participant = "PARTICIPANT",
+  GameLeader = "GAME_LEADER"
 }
 
 export enum GameStateEnum {
@@ -36,11 +38,6 @@ export enum GameStateEnum {
   GameLeaderDraws = "GAME_LEADER_DRAWS",
   ParticipantsDraw = "PARTICIPANTS_DRAW",
   Review = "REVIEW",
-}
-
-export enum RoleEnum {
-  Participant = "PARTICIPANT",
-  GameLeader = "GAME_LEADER"
 }
 
 

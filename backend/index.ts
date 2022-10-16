@@ -92,6 +92,9 @@ const handleLoginMessage = (client: CustomWebSocket, message: Message) => {
 const handleAnswerLoginMessage = (ws: CustomWebSocket, isBinary: boolean) => {
     if (ws.readyState === webSocket.OPEN) {
       ws.send(jsonToRawData({ type: MessageTypeEnum.AssignedUsername, data: ws.info.username }), { binary: isBinary });
+      if (ws.info.isAdmin) {
+        ws.send(jsonToRawData({ type: MessageTypeEnum.IsAdmin, data: true }), { binary: isBinary });
+      }
     }
 }
 
@@ -99,6 +102,14 @@ const handleDrawLeaderMessage = (ws: CustomWebSocket, rawData: webSocket.RawData
   wss.clients.forEach((client) => {
     if (client !== ws && client.readyState === webSocket.OPEN) {
       client.send(rawData, { binary: isBinary });
+    }
+  });
+}
+
+const handleChatMessage = (ws: CustomWebSocket, chatMessage: Message, isBinary: boolean) => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === webSocket.OPEN) {
+      client.send(jsonToRawData({ type: MessageTypeEnum.Chat, data: `${ws.info.username} ${chatMessage.data}`}), { binary: isBinary });
     }
   });
 }
@@ -117,6 +128,9 @@ function handleMessage(rawData: webSocket.RawData, isBinary: boolean) {
       break;
     case MessageTypeEnum.DrawLeader:
       handleDrawLeaderMessage(this, rawData, isBinary);
+      break;
+    case MessageTypeEnum.Chat:
+      handleChatMessage(this, data, isBinary);
       break;
   }
 }
@@ -141,12 +155,12 @@ setInterval(function interval() {
 
 const port = +env.BIND_PORT || 8000;
 
-if (require.main === module) {
+console.log(require.main)
+
   server.on('listening', function listening() {
     console.log(`server listening on port`, port);
   });
 
   server.listen(port, env.BIND_ADDRESS || '::');
-}
 
 module.exports = { server, wss };

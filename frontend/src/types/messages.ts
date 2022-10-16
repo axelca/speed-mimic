@@ -7,6 +7,9 @@ export enum MessageTypeEnum {
   AssignedUsername = "ASSIGNED_USERNAME",
   Restart = "RESTART",
   GameState = "GAME_STATE",
+  Role = "ROLE",
+  IsAdmin = "IS_ADMIN",
+  Chat = "CHAT",
 }
 
 export interface Message {
@@ -16,4 +19,9 @@ export interface Message {
 export interface Coordinate {
   x: number;
   y: number;
+}
+
+export enum RoleEnum {
+  Participant = "PARTICIPANT",
+  GameLeader = "GAME_LEADER",
 }

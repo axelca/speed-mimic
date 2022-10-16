@@ -38,7 +38,7 @@ const TestImageTransfer: FC = () => {
     if (!drawMessage?.data) {
       return;
     }
-    
+
     ref.current?.redrawImage(drawMessage.data);
   }, [lastMessage]);
 
